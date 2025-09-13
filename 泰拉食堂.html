@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰拉食堂 - 模型管理中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .filter-category {
+            margin-bottom: 20px;
+        }
+
+        .filter-category h3 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .category-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .select-category-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .select-category-btn:hover {
+            background: #219a52;
+            transform: scale(1.05);
+        }
+
+        .clear-category-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-category-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .filter-category .emoji {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 8px 16px;
+            background: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .tag:hover {
+            background: #d5dbdb;
+            transform: translateY(-2px);
+        }
+
+        .tag.selected {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .filter-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .select-all-btn {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .select-all-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .clear-filters {
+            margin-top: 0;
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-filters:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .models-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .models-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .models-header h2 {
+            color: #2c3e50;
+            margin-right: 15px;
+        }
+
+        .model-count {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .model-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .model-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .model-name .icon {
+            margin-right: 8px;
+            font-size: 1.5rem;
+        }
+
+        .model-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .model-tag {
+            padding: 3px 8px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            border: 1px solid #bbdefb;
+        }
+
+        .no-models {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-tags {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ 泰拉食堂</h1>
+            <p>干员饭盒管理中心 - 通过词条筛选查找您需要的干员饭盒</p>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">👥</span>职业
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('职业')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('职业')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="职业">
+                    <div class="tag" data-value="先锋">先锋</div>
+                    <div class="tag" data-value="近卫">近卫</div>
+                    <div class="tag" data-value="重装">重装</div>
+                    <div class="tag" data-value="狙击">狙击</div>
+                    <div class="tag" data-value="术师">术师</div>
+                    <div class="tag" data-value="医疗">医疗</div>
+                    <div class="tag" data-value="辅助">辅助</div>
+                    <div class="tag" data-value="特种">特种</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">🎯</span>分支
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('分支')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('分支')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="分支">
+                    <div class="tag" data-value="尖兵">尖兵</div>
+                    <div class="tag" data-value="冲锋手">冲锋手</div>
+                    <div class="tag" data-value="战术家">战术家</div>
+                    <div class="tag" data-value="教官">教官</div>
+                    <div class="tag" data-value="炮手">炮手</div>
+                    <div class="tag" data-value="神射手">神射手</div>
+                    <div class="tag" data-value="攻城手">攻城手</div>
+                    <div class="tag" data-value="投掷手">投掷手</div>
+                    <div class="tag" data-value="中坚术师">中坚术师</div>
+                    <div class="tag" data-value="扩散术师">扩散术师</div>
+                    <div class="tag" data-value="链术师">链术师</div>
+                    <div class="tag" data-value="秘术师">秘术师</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">⭐</span>稀有度
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('稀有度')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('稀有度')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="稀有度">
+                    <div class="tag" data-value="⭐1">⭐1</div>
+                    <div class="tag" data-value="⭐2">⭐2</div>
+                    <div class="tag" data-value="⭐3">⭐3</div>
+                    <div class="tag" data-value="⭐4">⭐4</div>
+                    <div class="tag" data-value="⭐5">⭐5</div>
+                    <div class="tag" data-value="⭐6">⭐6</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">🎯</span>位置
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('位置')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('位置')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="位置">
+                    <div class="tag" data-value="近战位">近战位</div>
+                    <div class="tag" data-value="远程位">远程位</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">👤</span>性别
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('性别')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('性别')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="性别">
+                    <div class="tag" data-value="男性">男性</div>
+                    <div class="tag" data-value="女性">女性</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">🎁</span>获取途径
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('获取途径')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('获取途径')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="获取途径">
+                    <div class="tag" data-value="公开招募">公开招募</div>
+                    <div class="tag" data-value="标准寻访">标准寻访</div>
+                    <div class="tag" data-value="限定寻访">限定寻访</div>
+                    <div class="tag" data-value="活动获得">活动获得</div>
+                    <div class="tag" data-value="商店兑换">商店兑换</div>
+                    <div class="tag" data-value="主线关卡">主线关卡</div>
+                </div>
+            </div>
+
+            <div class="filter-category">
+                <h3>
+                    <div class="category-title">
+                        <span class="emoji">💪</span>词缀
+                    </div>
+                    <div class="category-actions">
+                        <button class="category-btn select-category-btn" onclick="selectCategoryTags('词缀')">全选</button>
+                        <button class="category-btn clear-category-btn" onclick="clearCategoryTags('词缀')">清除</button>
+                    </div>
+                </h3>
+                <div class="filter-tags" data-category="词缀">
+                    <div class="tag" data-value="输出">输出</div>
+                    <div class="tag" data-value="生存">生存</div>
+                    <div class="tag" data-value="群攻">群攻</div>
+                    <div class="tag" data-value="控场">控场</div>
+                    <div class="tag" data-value="支援">支援</div>
+                    <div class="tag" data-value="削弱">削弱</div>
+                    <div class="tag" data-value="位移">位移</div>
+                    <div class="tag" data-value="召唤">召唤</div>
+                    <div class="tag" data-value="治疗">治疗</div>
+                    <div class="tag" data-value="防护">防护</div>
+                    <div class="tag" data-value="费用回复">费用回复</div>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="select-all-btn" onclick="selectAllFilters()">🔄 全选</button>
+                <button class="clear-filters" onclick="clearAllFilters()">🗑️ 清除所有筛选</button>
+            </div>
+        </div>
+
+        <div class="models-section">
+            <div class="models-header">
+                <h2>🍽️ 干员饭盒</h2>
+                <div class="model-count" id="model-count">1个</div>
+            </div>
+            <div class="models-grid" id="models-grid">
+                <div class="no-models">
+                    🔍 正在加载模型数据...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let modelsData = [];
+        let selectedFilters = new Set();
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadModelsData();
+            setupEventListeners();
+            updateDisplay();
+        });
+
+        // 加载模型数据
+        async function loadModelsData() {
+            try {
+                // 读取词条文件
+                const response = await fetch('./词条.txt');
+                const text = await response.text();
+                
+                const lines = text.trim().split('\n').filter(line => line.trim());
+                
+                for (const line of lines) {
+                    const parts = line.trim().split(' ').filter(part => part.trim());
+                    if (parts.length >= 8) {
+                        const [name, profession, branch, rarity, position, gender, obtain, ...affixes] = parts;
+                        
+                        // 检查对应的HTML文件是否存在
+                        try {
+                            const htmlResponse = await fetch(`./${name}.html`);
+                            if (htmlResponse.ok) {
+                                modelsData.push({
+                                    name: name,
+                                    profession: profession,
+                                    branch: branch,
+                                    rarity: rarity,
+                                    position: position,
+                                    gender: gender,
+                                    obtain: obtain,
+                                    affixes: affixes,
+                                    allTags: [profession, branch, rarity, position, gender, obtain, ...affixes]
+                                });
+                            }
+                        } catch (e) {
+                            console.log(`模型文件 ${name}.html 不存在`);
+                        }
+                    }
+                }
+                
+                console.log('加载了', modelsData.length, '个模型');
+                updateStats();
+            } catch (error) {
+                console.error('加载模型数据失败:', error);
+                document.getElementById('models-grid').innerHTML = 
+                    '<div class="no-models">❌ 加载模型数据失败，请检查词条.txt文件</div>';
+            }
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 为所有筛选标签添加点击事件
+            document.querySelectorAll('.tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const value = this.dataset.value;
+                    
+                    if (this.classList.contains('selected')) {
+                        // 取消选择
+                        this.classList.remove('selected');
+                        selectedFilters.delete(value);
+                    } else {
+                        // 选择
+                        this.classList.add('selected');
+                        selectedFilters.add(value);
+                    }
+                    
+                    updateDisplay();
+                    updateStats();
+                });
+            });
+        }
+
+        // 全选所有筛选条件
+        function selectAllFilters() {
+            // 清除当前选择
+            selectedFilters.clear();
+            document.querySelectorAll('.tag.selected').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+            
+            // 选择所有标签
+            document.querySelectorAll('.tag').forEach(tag => {
+                const value = tag.dataset.value;
+                tag.classList.add('selected');
+                selectedFilters.add(value);
+            });
+            
+            updateDisplay();
+            updateStats();
+        }
+
+        // 选择指定分类下的所有词条
+        function selectCategoryTags(category) {
+            const categoryTags = document.querySelectorAll(`[data-category="${category}"] .tag`);
+            
+            categoryTags.forEach(tag => {
+                const value = tag.dataset.value;
+                if (!tag.classList.contains('selected')) {
+                    tag.classList.add('selected');
+                    selectedFilters.add(value);
+                }
+            });
+            
+            updateDisplay();
+            updateStats();
+        }
+
+        // 清除指定分类下的所有词条
+        function clearCategoryTags(category) {
+            const categoryTags = document.querySelectorAll(`[data-category="${category}"] .tag`);
+            
+            categoryTags.forEach(tag => {
+                const value = tag.dataset.value;
+                if (tag.classList.contains('selected')) {
+                    tag.classList.remove('selected');
+                    selectedFilters.delete(value);
+                }
+            });
+            
+            updateDisplay();
+            updateStats();
+        }
+
+        // 清除所有筛选
+        function clearAllFilters() {
+            selectedFilters.clear();
+            document.querySelectorAll('.tag.selected').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+            updateDisplay();
+            updateStats();
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            const filteredModels = filterModels();
+            renderModels(filteredModels);
+            updateModelCount(filteredModels.length);
+        }
+
+        // 筛选模型
+        function filterModels() {
+            if (selectedFilters.size === 0) {
+                return modelsData;
+            }
+            
+            // 按分类组织选中的筛选条件
+            const filtersByCategory = {
+                '职业': [],
+                '分支': [],
+                '稀有度': [],
+                '位置': [],
+                '性别': [],
+                '获取途径': [],
+                '词缀': []
+            };
+            
+            // 将选中的筛选条件按分类分组
+            Array.from(selectedFilters).forEach(filter => {
+                // 根据词条值判断属于哪个分类
+                if (['先锋', '近卫', '重装', '狙击', '术师', '医疗', '辅助', '特种'].includes(filter)) {
+                    filtersByCategory['职业'].push(filter);
+                } else if (['尖兵', '冲锋手', '战术家', '教官', '炮手', '神射手', '攻城手', '投掷手', '中坚术师', '扩散术师', '链术师', '秘术师'].includes(filter)) {
+                    filtersByCategory['分支'].push(filter);
+                } else if (['⭐1', '⭐2', '⭐3', '⭐4', '⭐5', '⭐6'].includes(filter)) {
+                    filtersByCategory['稀有度'].push(filter);
+                } else if (['近战位', '远程位'].includes(filter)) {
+                    filtersByCategory['位置'].push(filter);
+                } else if (['男性', '女性'].includes(filter)) {
+                    filtersByCategory['性别'].push(filter);
+                } else if (['公开招募', '标准寻访', '限定寻访', '活动获得', '商店兑换', '主线关卡'].includes(filter)) {
+                    filtersByCategory['获取途径'].push(filter);
+                } else if (['输出', '生存', '群攻', '控场', '支援', '削弱', '位移', '召唤', '治疗', '防护', '费用回复'].includes(filter)) {
+                    filtersByCategory['词缀'].push(filter);
+                }
+            });
+            
+            return modelsData.filter(model => {
+                // 对每个有筛选条件的分类，检查模型是否满足该分类的条件
+                for (const [category, filters] of Object.entries(filtersByCategory)) {
+                    if (filters.length > 0) {
+                        let categoryMatched = false;
+                        
+                        // 在该分类内，只要满足任意一个条件即可（OR逻辑）
+                        if (category === '职业') {
+                            categoryMatched = filters.includes(model.profession);
+                        } else if (category === '分支') {
+                            categoryMatched = filters.includes(model.branch);
+                        } else if (category === '稀有度') {
+                            categoryMatched = filters.includes(model.rarity);
+                        } else if (category === '位置') {
+                            categoryMatched = filters.includes(model.position);
+                        } else if (category === '性别') {
+                            categoryMatched = filters.includes(model.gender);
+                        } else if (category === '获取途径') {
+                            categoryMatched = filters.includes(model.obtain);
+                        } else if (category === '词缀') {
+                            // 词缀可能有多个，只要有任意一个匹配即可
+                            categoryMatched = filters.some(filter => model.affixes.includes(filter));
+                        }
+                        
+                        // 如果该分类不匹配，则整个模型不符合条件
+                        if (!categoryMatched) {
+                            return false;
+                        }
+                    }
+                }
+                
+                // 所有有筛选条件的分类都匹配，则该模型符合条件
+                return true;
+            });
+        }
+
+        // 渲染模型列表
+        function renderModels(models) {
+            const grid = document.getElementById('models-grid');
+            
+            if (models.length === 0) {
+                grid.innerHTML = '<div class="no-models">🔍 没有找到符合条件的模型</div>';
+                return;
+            }
+            
+            grid.innerHTML = models.map(model => `
+                <div class="model-card" onclick="openModel('${model.name}')">
+                    <div class="model-name">
+                        <span class="icon">${getModelIcon(model.profession)}</span>
+                        ${model.name}
+                    </div>
+                    <div class="model-tags">
+                        <div class="model-tag">${model.profession}</div>
+                        <div class="model-tag">${model.branch}</div>
+                        <div class="model-tag">${model.rarity}</div>
+                        <div class="model-tag">${model.position}</div>
+                        ${model.affixes.map(affix => `<div class="model-tag">${affix}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 获取模型图标
+        function getModelIcon(profession) {
+            const icons = {
+                '先锋': '⚔️',
+                '近卫': '🗡️',
+                '重装': '🛡️',
+                '狙击': '🏹',
+                '术师': '🔮',
+                '医疗': '🏥',
+                '辅助': '🌟',
+                '特种': '🎭'
+            };
+            return icons[profession] || '👤';
+        }
+
+        // 打开模型
+        function openModel(modelName) {
+            window.open(`./${modelName}.html`, '_blank');
+        }
+
+        // 更新模型计数
+        function updateModelCount(count) {
+            document.getElementById('model-count').textContent = `${count}个`;
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            // 统计信息已移除，保留函数以免报错
+            console.log('当前模型数:', modelsData.length, '选中筛选:', selectedFilters.size);
+        }
+    </script>
+</body>
+</html>
